@@ -1,4 +1,4 @@
-# Three.js Journey
+# How to set up LoL Map
 
 ## Setup
 Download [Node.js](https://nodejs.org/en/download/).
