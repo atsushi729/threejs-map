@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as dat from 'lil-gui'
 
 /**
@@ -13,6 +14,21 @@ const canvas = document.querySelector('canvas.webgl')
 
 // Scene
 const scene = new THREE.Scene()
+
+/**
+ * Models
+ */
+const gltfLoader = new GLTFLoader();
+let mixer = null;
+
+gltfLoader.load("/models/Fox/glTF/Fox.gltf", (gltf) => {
+  gltf.scene.scale.set(0.025, 0.025, 0.025);
+  scene.add(gltf.scene);
+
+  mixer = new THREE.AnimationMixer(gltf.scene);
+  const action = mixer.clipAction(gltf.animations[0]);
+  action.play();
+});
 
 /**
  * Textures
@@ -55,27 +71,27 @@ const textureLoader = new THREE.TextureLoader()
 /**
  * House
  */
-const house = new THREE.Group()
-scene.add(house)
+// const house = new THREE.Group()
+// scene.add(house)
 
 // Walls
-const bricksColorTexture = textureLoader.load('/textures/bricks/color.jpg')
-const bricksAmbientOcclusionTexture = textureLoader.load('/textures/bricks/ambientOcclusion.jpg')
-const bricksNormalTexture = textureLoader.load('/textures/bricks/normal.jpg')
-const bricksRoughnessTexture = textureLoader.load('/textures/bricks/roughness.jpg')
+// const bricksColorTexture = textureLoader.load('/textures/bricks/color.jpg')
+// const bricksAmbientOcclusionTexture = textureLoader.load('/textures/bricks/ambientOcclusion.jpg')
+// const bricksNormalTexture = textureLoader.load('/textures/bricks/normal.jpg')
+// const bricksRoughnessTexture = textureLoader.load('/textures/bricks/roughness.jpg')
 
-const walls = new THREE.Mesh(
-    new THREE.BoxGeometry(4, 2.5, 4),
-    new THREE.MeshStandardMaterial({
-        map: bricksColorTexture,
-        aoMap: bricksAmbientOcclusionTexture,
-        normalMap: bricksNormalTexture,
-        roughnessMap: bricksRoughnessTexture
-    })
-)
-walls.geometry.setAttribute('uv2', new THREE.Float32BufferAttribute(walls.geometry.attributes.uv.array, 2))
-walls.position.y = 2.5 / 2
-house.add(walls)
+// const walls = new THREE.Mesh(
+//     new THREE.BoxGeometry(4, 2.5, 4),
+//     new THREE.MeshStandardMaterial({
+//         map: bricksColorTexture,
+//         aoMap: bricksAmbientOcclusionTexture,
+//         normalMap: bricksNormalTexture,
+//         roughnessMap: bricksRoughnessTexture
+//     })
+// )
+// walls.geometry.setAttribute('uv2', new THREE.Float32BufferAttribute(walls.geometry.attributes.uv.array, 2))
+// walls.position.y = 2.5 / 2
+// house.add(walls)
 
 // Floor
 const grassColorTexture = textureLoader.load('/textures/grass/color.jpg')
@@ -114,13 +130,13 @@ floor.position.y = 0
 scene.add(floor)
 
 // Roof
-const roof = new THREE.Mesh(
-    new THREE.ConeGeometry(3.5, 1, 4),
-    new THREE.MeshStandardMaterial({ color: '#b35f45' })
-)
-roof.rotation.y = Math.PI * 0.25
-roof.position.y = 2.5 + 0.5
-house.add(roof)
+// const roof = new THREE.Mesh(
+//     new THREE.ConeGeometry(3.5, 1, 4),
+//     new THREE.MeshStandardMaterial({ color: '#b35f45' })
+// )
+// roof.rotation.y = Math.PI * 0.25
+// roof.position.y = 2.5 + 0.5
+// house.add(roof)
 
 // Door
 const doorColorTexture = textureLoader.load('/textures/door/color.jpg')
@@ -145,15 +161,15 @@ const door = new THREE.Mesh(
         roughnessMap: doorRoughnessTexture
     })
 )
-door.geometry.setAttribute('uv2', new THREE.Float32BufferAttribute(door.geometry.attributes.uv.array, 2))
-door.position.y = 1
-door.position.z = 2 + 0.01
-house.add(door)
+// door.geometry.setAttribute('uv2', new THREE.Float32BufferAttribute(door.geometry.attributes.uv.array, 2))
+// door.position.y = 1
+// door.position.z = 2 + 0.01
+// house.add(door)
 
 // Door light
-const doorLight = new THREE.PointLight('#ff7d46', 1, 7)
-doorLight.position.set(0, 2.2, 2.7)
-house.add(doorLight)
+// const doorLight = new THREE.PointLight('#ff7d46', 1, 7)
+// doorLight.position.set(0, 2.2, 2.7)
+// house.add(doorLight)
 
 // Bushes
 const bushGeometry = new THREE.SphereGeometry(1, 16, 16)
@@ -175,7 +191,7 @@ const bush4 = new THREE.Mesh(bushGeometry, bushMaterial)
 bush4.scale.set(0.15, 0.15, 0.15)
 bush4.position.set(- 1, 0.05, 2.6)
 
-house.add(bush1, bush2, bush3, bush4)
+// house.add(bush1, bush2, bush3, bush4)
 
 // Graves
 const graves = new THREE.Group()
@@ -308,9 +324,18 @@ renderer.setClearColor('#262837')
  * Animate
  */
 const clock = new THREE.Clock()
+let previousTime = 0;
+
+
 
 const tick = () => {
     const elapsedTime = clock.getElapsedTime()
+    const deltaTime = elapsedTime - previousTime;
+    previousTime = elapsedTime;
+
+    if (mixer) {
+        mixer.update(deltaTime);
+    }
 
     // Update controls
     controls.update()
