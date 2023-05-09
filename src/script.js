@@ -20,15 +20,107 @@ const scene = new THREE.Scene();
  */
 const gltfLoader = new GLTFLoader();
 let mixer = null;
+let mixer1 = null;
 
+// Import Fox model
 gltfLoader.load("/models/Fox/glTF/Fox.gltf", (gltf) => {
   gltf.scene.scale.set(0.025, 0.025, 0.025);
+  gltf.scene.position.set(0, 0, 5);
   scene.add(gltf.scene);
 
+  // Animation of Fox
   mixer = new THREE.AnimationMixer(gltf.scene);
-  const action = mixer.clipAction(gltf.animations[0]);
+  const action = mixer.clipAction(gltf.animations[2]);
   action.play();
 });
+
+// Import Stone Floor model
+gltfLoader.load("/models/StoneFloor/scene.gltf", (gltf) => {
+  gltf.scene.position.set(0, -2.8, 0);
+  scene.add(gltf.scene);
+});
+
+// Import Stone Wall model(right position)
+gltfLoader.load("/models/StoneWall/scene.gltf", (gltf) => {
+  gltf.scene.scale.set(0.3, 1, 1);
+  gltf.scene.position.set(11, 0.6, -3);
+  gltf.scene.rotation.y = -Math.PI * 0.5;
+  scene.add(gltf.scene);
+});
+
+// Import Stone Wall model(left position)
+gltfLoader.load("/models/StoneWall/scene.gltf", (gltf) => {
+  gltf.scene.scale.set(0.3, 1, 1);
+  gltf.scene.position.set(-11, 0.6, -3);
+  gltf.scene.rotation.y = -Math.PI * 0.5;
+  scene.add(gltf.scene);
+});
+
+// Import Torch model
+gltfLoader.load("/models/Torch/scene.gltf", (gltf) => {
+  gltf.scene.scale.set(0.5, 0.5, 0.5);
+  gltf.scene.position.set(-5, -1, 0);
+  scene.add(gltf.scene);
+
+  console.log(gltf);
+
+  // Animation of Torch
+  mixer1 = new THREE.AnimationMixer(gltf.scene);
+  const action = mixer1.clipAction(gltf.animations[0]);
+  action.play();
+});
+
+/**
+ * TODO :
+ *  import multiple 3D models
+ *  enable shadow effect
+ *  floor texture
+ */
+
+// Import Tree model
+gltfLoader.load("/models/PineTree/scene.gltf", (gltf) => {
+  //   for (let i = 0; i < 10; i++) {
+  //     const angle = Math.random() * Math.PI * 2; // Random angle
+  //     const radius = 6 + Math.random() * 6; // Random radius
+  //     const x = Math.cos(angle) * radius; // Get the x position using cosinus
+  //     const z = Math.sin(angle) * radius; // Get the z position using sinus
+
+  gltf.scene.scale.set(0.25, 0.25, 0.25);
+  gltf.scene.position.set(5, 0.25, 1);
+  // gltf.scene.position.set(x, 0.25, z);
+  scene.add(gltf.scene);
+  console.log(gltf);
+  //   console.log("counter", i);
+  //   }
+});
+
+// Trees
+// const trees = new THREE.Group();
+// scene.add(trees);
+
+// const treeGeometry = new THREE.CylinderGeometry(0, 1, 3, 8);
+// const treeMaterial = new THREE.MeshStandardMaterial({ color: "green" });
+// const trunkGeometry = new THREE.CylinderGeometry(0.2, 0.3, 3, 8);
+// const trunkMaterial = new THREE.MeshStandardMaterial({ color: "brown" });
+
+// for (let i = 0; i < 10; i++) {
+//   const angle = Math.random() * Math.PI * 2; // Random angle
+//   const radius = 6 + Math.random() * 6; // Random radius
+//   const x = Math.cos(angle) * radius; // Get the x position using cosinus
+//   const z = Math.sin(angle) * radius; // Get the z position using sinus
+
+//   // Create the mesh
+//   const leaf = new THREE.Mesh(treeGeometry, treeMaterial);
+//   const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+
+//   // Position
+//   leaf.position.set(x, 3, z);
+//   trunk.position.set(x, 1, z);
+
+//   // Add to the trees container
+//   trees.add(leaf);
+//   trees.add(trunk);
+// }
 
 /**
  * Textures
@@ -62,7 +154,7 @@ grassNormalTexture.wrapT = THREE.RepeatWrapping;
 grassRoughnessTexture.wrapT = THREE.RepeatWrapping;
 
 const floor = new THREE.Mesh(
-  new THREE.PlaneGeometry(20, 20),
+  new THREE.PlaneGeometry(26, 26),
   new THREE.MeshStandardMaterial({
     map: grassColorTexture,
     aoMap: grassAmbientOcclusionTexture,
@@ -78,77 +170,23 @@ floor.rotation.x = -Math.PI * 0.5;
 floor.position.y = 0;
 scene.add(floor);
 
-// Graves
-const graves = new THREE.Group();
-scene.add(graves);
-
-const graveGeometry = new THREE.BoxGeometry(0.6, 0.8, 0.2);
-const graveMaterial = new THREE.MeshStandardMaterial({ color: "#b2b6b1" });
-
-for (let i = 0; i < 50; i++) {
-  const angle = Math.random() * Math.PI * 2; // Random angle
-  const radius = 3 + Math.random() * 6; // Random radius
-  const x = Math.cos(angle) * radius; // Get the x position using cosinus
-  const z = Math.sin(angle) * radius; // Get the z position using sinus
-
-  // Create the mesh
-  const grave = new THREE.Mesh(graveGeometry, graveMaterial);
-
-  // Position
-  grave.position.set(x, 0.3, z);
-
-  // Rotation
-  grave.rotation.z = (Math.random() - 0.5) * 0.4;
-  grave.rotation.y = (Math.random() - 0.5) * 0.4;
-
-  // Add to the graves container
-  graves.add(grave);
-}
-
-// Trees
-const trees = new THREE.Group();
-scene.add(trees);
-
-const treeGeometry = new THREE.CylinderGeometry(0, 1, 3, 8);
-const treeMaterial = new THREE.MeshStandardMaterial({ color: "green" });
-const trunkGeometry = new THREE.CylinderGeometry(0.2, 0.3, 3, 8);
-const trunkMaterial = new THREE.MeshStandardMaterial({ color: "brown" });
-
-for (let i = 0; i < 10; i++) {
-  const angle = Math.random() * Math.PI * 2; // Random angle
-  const radius = 6 + Math.random() * 6; // Random radius
-  const x = Math.cos(angle) * radius; // Get the x position using cosinus
-  const z = Math.sin(angle) * radius; // Get the z position using sinus
-
-  // Create the mesh
-  const leaf = new THREE.Mesh(treeGeometry, treeMaterial);
-  const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-
-  // Position
-  leaf.position.set(x, 3, z);
-  trunk.position.set(x, 1, z);
-
-  // Add to the trees container
-  trees.add(leaf);
-  trees.add(trunk);
-}
-
 /**
  * Fog
  */
-const fog = new THREE.Fog("#262837", 1, 15);
-scene.fog = fog;
+// const fog = new THREE.Fog("#262837", 1, 15);
+// scene.fog = fog;
 
 /**
  * Lights
  */
 // Ambient light
-const ambientLight = new THREE.AmbientLight("#b9d5ff", 0.12);
+// const ambientLight = new THREE.AmbientLight("#b9d5ff", 0.12);
+const ambientLight = new THREE.AmbientLight("#f9ffb9", 0.5);
 gui.add(ambientLight, "intensity").min(0).max(1).step(0.001);
 scene.add(ambientLight);
 
 // Directional light
-const moonLight = new THREE.DirectionalLight("#b9d5ff", 0.12);
+const moonLight = new THREE.DirectionalLight("#b9d5ff", 0.5);
 moonLight.position.set(4, 5, -2);
 gui.add(moonLight, "intensity").min(0).max(1).step(0.001);
 gui.add(moonLight.position, "x").min(-5).max(5).step(0.001);
@@ -221,6 +259,9 @@ const tick = () => {
   // Update 3D model animation
   if (mixer) {
     mixer.update(deltaTime);
+  }
+  if (mixer1) {
+    mixer1.update(deltaTime * 2);
   }
 
   // Update controls
